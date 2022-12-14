@@ -7,7 +7,7 @@ namespace DelegatesAndEvents
     /// <inheritdoc cref="IObservableList{T}" />
     public class ObservableList<TItem> : IObservableList<TItem>
     {
-        private IList<TItem> _list = new List<TItem>();
+        private readonly IList<TItem> _list = new List<TItem>();
 
         /// <inheritdoc cref="IObservableList{T}.ElementInserted" />
         public event ListChangeCallback<TItem> ElementInserted;
@@ -45,10 +45,7 @@ namespace DelegatesAndEvents
         public IEnumerator<TItem> GetEnumerator() =>_list.GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator" />
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="ICollection{T}.Add" />
         public void Add(TItem item)
@@ -57,7 +54,14 @@ namespace DelegatesAndEvents
             ElementInserted?.Invoke(this, item, Count - 1);
         }
         /// <inheritdoc cref="ICollection{T}.Clear" />
-        public void Clear() => _list.Clear();
+        public void Clear() {
+            var clone = new List<TItem>(_list);
+            _list.Clear();
+            for (int i = 0; i < clone.Count; i++)
+            {
+                this.ElementRemoved?.Invoke(this, clone[i], i);
+            }
+        }
 
         /// <inheritdoc cref="ICollection{T}.Contains" />
         public bool Contains(TItem item) =>_list.Contains(item);
@@ -98,18 +102,7 @@ namespace DelegatesAndEvents
 
         public bool Equals(ObservableList<TItem> olist)
         {
-            if (Count != olist.Count)
-            {
-                return false;
-            }
-            for (int i = 0; i < Count; i++)
-            {
-                if (!this[i].Equals(olist[i]))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return _list.Equals(olist._list);
         }
 
         /// <inheritdoc cref="object.Equals(object?)" />
@@ -123,12 +116,10 @@ namespace DelegatesAndEvents
         }
 
         /// <inheritdoc cref="object.GetHashCode" />
-        public override int GetHashCode() => HashCode.Combine(_list);
+        public override int GetHashCode() => _list.GetHashCode();
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return _list.ToString();
-        }
+        public override string ToString() => _list.ToString();
+        
     }
 }
