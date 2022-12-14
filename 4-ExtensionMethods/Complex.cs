@@ -22,64 +22,58 @@ namespace ExtensionMethods
         /// <inheritdoc cref="IComplex.Real"/>
         public double Real
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
+            get => re;
         }
 
         /// <inheritdoc cref="IComplex.Imaginary"/>
         public double Imaginary
         {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
+            get => im;
         }
 
         /// <inheritdoc cref="IComplex.Modulus"/>
-        public double Modulus
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-        }
+        public double Modulus => Math.Sqrt(Real * Real + Imaginary * Imaginary);
 
         /// <inheritdoc cref="IComplex.Phase"/>
-        public double Phase
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-        }
+        public double Phase => Math.Atan2(Imaginary, Real);
 
         /// <inheritdoc cref="IComplex.ToString"/>
         public override string ToString()
         {
             // TODO improve
-            return base.ToString();
+            if (Imaginary == 0.0) return Real.ToString();
+            var imAbs = Math.Abs(Imaginary);
+            var imValue = imAbs == 1.0 ? "" : imAbs.ToString();
+            string sign;
+            if (Real == 0d)
+            {
+                sign = Imaginary > 0 ? "" : "-";
+                return sign + "i" + imValue;
+            }
+
+            sign = Imaginary > 0 ? "+" : "-";
+            return $"{Real} {sign} i{imValue}";
         }
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(IComplex other)
-        {
-            throw new System.NotImplementedException();
-        }
+        public bool Equals(IComplex other) => Real == other.Real && Imaginary == other.Imaginary;
 
         /// <inheritdoc cref="object.Equals(object?)"/>
         public override bool Equals(object obj)
         {
             // TODO improve
-            return base.Equals(obj);
+            if (obj is Complex)
+            {
+                return Equals(obj as Complex);
+            }
+            return false;
         }
 
         /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             // TODO improve
-            return base.GetHashCode();
+            return HashCode.Combine(Real, Imaginary);
         }
     }
 }
