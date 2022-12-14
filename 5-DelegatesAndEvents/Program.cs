@@ -64,7 +64,6 @@ namespace DelegatesAndEvents
 
             Console.WriteLine("Ok");
 
-            Console.WriteLine(list.ToString());
         }
     }
 }
